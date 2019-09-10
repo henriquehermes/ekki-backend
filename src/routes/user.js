@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const router = express();
 
-const { User } = require('../models');
+const { User, Account } = require('../models');
 const UserValidator = require('../validator/user');
 const LoginValidator = require('../validator/login');
 const joi = require('../middlewares/joi');
@@ -33,6 +33,8 @@ router.post('/register', joi(UserValidator), async (req, res) => {
     dataUser.password = await bcrypt.hash(dataUser.password, 10);
 
     const user = await User.create(dataUser);
+
+    await Account.create({ limit: 500, ammount: 1000, UserID: user.id });
 
     user.password = undefined;
 
