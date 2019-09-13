@@ -7,6 +7,9 @@ module.exports = (sequelize, DataTypes) => {
       references: 'Users', // <<< Note, its table's name, not object name
       referencesKey: 'id', // <<< Note, its a column name
     },
+    identifier: {
+      type: DataTypes.INTEGER,
+    },
   });
 
   return Account;

@@ -19,7 +19,8 @@
     "express-joi-validator": "^2.0.1",
     "jsonwebtoken": "^8.5.1",
     "pg": "^7.12.1",
-    "sequelize": "^5.18.1"
+    "sequelize": "^5.18.1",
+    "uniqid": "^5.0.3"
   },
   "devDependencies": {
     "eslint": "^6.3.0",

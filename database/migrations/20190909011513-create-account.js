@@ -16,6 +16,20 @@ module.exports = {
         allowNull: false,
         type: Sequelize.FLOAT,
       },
+      UserID: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: {
+            tableName: 'Users',
+          },
+          key: 'id', // key in Target model that we're referencing
+        },
+      },
+      identifier: {
+        allowNull: false,
+        unique: true,
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
