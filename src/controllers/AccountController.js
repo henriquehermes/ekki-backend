@@ -1,7 +1,7 @@
 const { BankStatement } = require('../models');
-const { getAccount, getIdentifier, updateAccount } = require('../helpers/account');
-const { createBankingState } = require('../helpers/bankStatement');
-const { updateTransaction, validateTransaction } = require('../helpers/transactions');
+const { getAccount, getIdentifier, updateAccount } = require('../helpers/AccountHelper');
+const { createBankingState } = require('../helpers/BankStatementHelper');
+const { updateTransaction, validateTransaction } = require('../helpers/TransactionsHelper');
 
 async function Index(req, res) {
   const { UserID } = req.params;
@@ -14,21 +14,25 @@ async function Index(req, res) {
 async function Transaction(req, res) {
   const { identifier } = req.params;
   const { favoredIdentifier, ammount } = req.body;
+  const targetSocket = req.connectedUsers[favoredIdentifier];
 
   if (identifier === favoredIdentifier) {
-    return res.status(404).send({ message: 'Not allowed.' });
+    return res.status(404).send({ code: 100, message: 'Not allowed.' });
   }
 
   const userAccount = await getIdentifier(identifier, res);
   const favoredAccount = await getIdentifier(favoredIdentifier, res);
 
-  await validateTransaction(userAccount.id, ammount, favoredIdentifier, res);
+  const validate = await validateTransaction(userAccount.id, ammount, favoredIdentifier, res);
+  if (!validate) {
+    return res.status(401).send({ code: 101, message: 'Not authorized.' });
+  }
 
   const newFavoredAmmount = favoredAccount.ammount + ammount;
 
   if (ammount > userAccount.ammount) {
     if (ammount > userAccount.ammount + userAccount.limit) {
-      return res.status(404).send({ message: 'Insufficient limit.' });
+      return res.status(404).send({ code: 102, message: 'Insufficient limit.' });
     }
 
     let newLimit;
@@ -41,20 +45,34 @@ async function Transaction(req, res) {
     await updateAccount(identifier, 0, newLimit);
     await updateAccount(favoredIdentifier, newFavoredAmmount, null);
 
-    await createBankingState(userAccount, favoredAccount, ammount, 0, newFavoredAmmount);
+    if (targetSocket) {
+      req.io.to(targetSocket).emit('transaction', {
+        UserID: userAccount.id,
+        ammount,
+      });
+    }
+
+    await createBankingState(userAccount, favoredAccount, ammount);
     await updateTransaction(userAccount.id, ammount, favoredIdentifier, res);
 
-    return res.status(200).send({ message: 'The limit is used to complete the transaction.' });
+    return res.status(200).send({ code: 103, message: 'The limit is used to complete the transaction.' });
   }
 
   const newAmmount = userAccount.ammount - ammount;
   await updateAccount(identifier, newAmmount, null);
   await updateAccount(favoredIdentifier, newFavoredAmmount, null);
 
-  await createBankingState(userAccount, favoredAccount, ammount, newAmmount, newFavoredAmmount);
+  if (targetSocket) {
+    req.io.to(targetSocket).emit('transaction', {
+      UserID: userAccount.id,
+      ammount,
+    });
+  }
+
+  await createBankingState(userAccount, favoredAccount, ammount);
   await updateTransaction(userAccount.id, ammount, favoredIdentifier, res);
 
-  return res.status(200).send({ message: 'Success.' });
+  return res.status(200).send({ success: true });
 }
 
 async function BankStatements(req, res) {

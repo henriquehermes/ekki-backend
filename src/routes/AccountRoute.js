@@ -3,7 +3,7 @@ const express = require('express');
 const router = express();
 
 const authMiddleware = require('../middlewares/auth');
-const AccountController = require('../controllers/account');
+const AccountController = require('../controllers/AccountController');
 
 router.use(authMiddleware);
 

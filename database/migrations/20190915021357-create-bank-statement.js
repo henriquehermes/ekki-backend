@@ -11,10 +11,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.FLOAT,
       },
-      balance: {
-        allowNull: false,
-        type: Sequelize.FLOAT,
-      },
       favoredIdentifier: {
         allowNull: false,
         type: Sequelize.INTEGER,
@@ -28,14 +24,9 @@ module.exports = {
           key: 'id', // key in Target model that we're referencing
         },
       },
-      createdAt: {
+      date: {
         allowNull: false,
         type: Sequelize.DATE,
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-        defaultValue: new Date(),
       },
     });
 

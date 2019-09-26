@@ -1,16 +1,32 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-
-const users = require('./routes/user');
-const accounts = require('./routes/account');
+const cors = require('cors');
 
 const app = express();
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+const connectedUsers = {};
+
+io.on('connection', (socket) => {
+  const { user } = socket.handshake.query;
+
+  connectedUsers[user] = socket.id;
+});
+
+const users = require('./routes/UserRoute');
+const accounts = require('./routes/AccountRoute');
+
+app.use((req, res, next) => {
+  req.io = io;
+  req.connectedUsers = connectedUsers;
+
+  return next();
+});
+
+app.use(cors());
+app.use(express.json());
 
 app.use('/user', users);
 app.use('/account', accounts);
 
-
-app.listen(3000);
+server.listen(3000);

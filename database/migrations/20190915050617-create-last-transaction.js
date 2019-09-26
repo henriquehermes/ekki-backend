@@ -6,6 +6,10 @@ module.exports = {
       primaryKey: true,
       type: Sequelize.INTEGER,
     },
+    lastTransaction: {
+      allowNull: false,
+      type: Sequelize.DATE,
+    },
     ammount: {
       allowNull: false,
       type: Sequelize.FLOAT,
@@ -16,21 +20,13 @@ module.exports = {
     },
     AccountID: {
       type: Sequelize.INTEGER,
+      allowNull: false,
       references: {
         model: {
           tableName: 'Accounts',
         },
         key: 'id', // key in Target model that we're referencing
       },
-    },
-    createdAt: {
-      allowNull: false,
-      type: Sequelize.DATE,
-    },
-    updatedAt: {
-      allowNull: false,
-      type: Sequelize.DATE,
-      defaultValue: new Date(),
     },
   }),
 

@@ -24,25 +24,21 @@ async function createBankingState(
   userAccount,
   favoredAccount,
   ammount,
-  newAmmount,
-  newFavoredAmmount,
 ) {
   await BankStatement.create({
     // SEND
     ammount,
-    balance: newAmmount,
     favoredIdentifier: favoredAccount.identifier,
     AccountID: userAccount.id,
-    createAt: new Date(),
+    date: new Date(),
   });
 
   await BankStatement.create({
     // RECEIVE
     ammount,
-    balance: newFavoredAmmount,
     favoredIdentifier: favoredAccount.identifier,
     AccountID: favoredAccount.id,
-    createAt: new Date(),
+    date: new Date(),
   });
 }
 

@@ -17,19 +17,19 @@ async function updateTransaction(AccountID, ammount, favoredIdentifier, res) {
       ammount,
       favoredIdentifier,
       AccountID,
-      updateAt: new Date(),
+      lastTransaction: new Date(),
     }))
     .catch(() => Transactions.create({
       ammount,
       favoredIdentifier,
       AccountID,
-      createdAt: new Date(),
+      lastTransaction: new Date(),
     }));
 
   return bStatement;
 }
 
-async function validateTransaction(AccountID, newAmmount, newFavoredIdentifier, res) {
+async function validateTransaction(AccountID, newAmmount, newFavoredIdentifier) {
   const cache = await Transactions.findOne({
     where: { AccountID },
   });
@@ -37,7 +37,7 @@ async function validateTransaction(AccountID, newAmmount, newFavoredIdentifier, 
   if (!cache) return true;
 
   const now = moment(new Date(), 'DD/MM/YYYY HH:mm:ss');
-  const duration = moment.duration(now.diff(moment(cache.updatedAt, 'DD/MM/YYYY HH:mm:ss')));
+  const duration = moment.duration(now.diff(moment(cache.lastTransaction, 'DD/MM/YYYY HH:mm:ss')));
   const minutes = duration.asMinutes();
 
   if (
@@ -45,7 +45,7 @@ async function validateTransaction(AccountID, newAmmount, newFavoredIdentifier, 
     && newFavoredIdentifier === cache.favoredIdentifier
     && minutes < 2
   ) {
-    return res.status(401).send({ message: 'Not authorized.' });
+    return false;
   }
 
   return true;
