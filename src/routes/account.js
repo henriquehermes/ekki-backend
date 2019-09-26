@@ -5,11 +5,12 @@ const router = express();
 const authMiddleware = require('../middlewares/auth');
 const AccountController = require('../controllers/account');
 
-
 router.use(authMiddleware);
 
-router.get('/:identifier', AccountController.Index);
+router.get('/:UserID', AccountController.Index);
 
 router.post('/:identifier/transfer', AccountController.Transaction);
+
+router.get('/:identifier/bankStatements', AccountController.BankStatements);
 
 module.exports = router;

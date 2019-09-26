@@ -29,7 +29,10 @@ async function Register(req, res) {
     const user = await User.create(dataUser);
 
     await Account.create({
-      limit: 500, ammount: 1000, UserID: user.id, identifier: Math.floor((Math.random() * 10000) + 1),
+      limit: 500,
+      ammount: 1000,
+      UserID: user.id,
+      identifier: Math.floor(Math.random() * 10000 + 1),
     });
 
     user.password = undefined;

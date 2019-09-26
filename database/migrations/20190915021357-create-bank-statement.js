@@ -1,38 +1,36 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    const AccountTable = queryInterface.createTable('Accounts', {
+    const BankStatements = queryInterface.createTable('BankStatements', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      limit: {
-        allowNull: false,
-        type: Sequelize.FLOAT,
-      },
       ammount: {
         allowNull: false,
         type: Sequelize.FLOAT,
       },
-      UserID: {
+      balance: {
+        allowNull: false,
+        type: Sequelize.FLOAT,
+      },
+      favoredIdentifier: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+      },
+      AccountID: {
         type: Sequelize.INTEGER,
         references: {
           model: {
-            tableName: 'Users',
+            tableName: 'Accounts',
           },
           key: 'id', // key in Target model that we're referencing
         },
       },
-      identifier: {
-        allowNull: false,
-        unique: true,
-        type: Sequelize.INTEGER,
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: new Date(),
       },
       updatedAt: {
         allowNull: false,
@@ -41,8 +39,8 @@ module.exports = {
       },
     });
 
-    return AccountTable;
+    return BankStatements;
   },
 
-  down: (queryInterface) => queryInterface.dropTable('Accounts'),
+  down: (queryInterface) => queryInterface.dropTable('BankStatements'),
 };
