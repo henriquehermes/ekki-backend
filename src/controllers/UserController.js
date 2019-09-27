@@ -2,10 +2,11 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const { User, Account } = require('../models');
-const authConfig = require('../../config/auth.json');
+
+const authConfig = process.env.AUTH_SECRET;
 
 function generateToken(params = {}) {
-  return jwt.sign({ id: params.id }, authConfig.secret, {
+  return jwt.sign({ id: params.id }, authConfig, {
     expiresIn: 86400,
   });
 }
