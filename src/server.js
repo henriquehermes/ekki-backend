@@ -31,4 +31,4 @@ app.use(express.json());
 app.use('/user', users);
 app.use('/account', accounts);
 
-server.listen(3000);
+server.listen(process.env.PORT || 3000);
