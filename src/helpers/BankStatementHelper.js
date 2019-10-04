@@ -20,26 +20,103 @@ async function getStatement(id, res) {
   return bStatement;
 }
 
-async function createBankingState(
-  userAccount,
-  favoredAccount,
-  ammount,
-) {
-  await BankStatement.create({
-    // SEND
-    ammount,
-    favoredIdentifier: favoredAccount.identifier,
-    AccountID: userAccount.id,
-    date: new Date(),
-  });
+async function createBankingState(userAccount, favoredAccount, ammount) {
+  await BankStatement.findOne({ where: { AccountID: userAccount } })
+    .then(async (bStatement) => {
+      if (bStatement.data) {
+        const newData = [
+          ...bStatement.data,
+          {
+            ammount,
+            favoredIdentifier: favoredAccount.identifier,
+            date: new Date(),
+          },
+        ];
 
-  await BankStatement.create({
-    // RECEIVE
-    ammount,
-    favoredIdentifier: favoredAccount.identifier,
-    AccountID: favoredAccount.id,
-    date: new Date(),
-  });
+        bStatement.update({
+          AccountID: userAccount,
+          data: newData,
+        });
+
+        await BankStatement.findOne({
+          where: { AccountID: favoredAccount.id },
+        })
+          .then((fStatement) => {
+            if (fStatement.data) {
+              const newDataFavored = [
+                ...fStatement.data,
+                {
+                  ammount,
+                  favoredIdentifier: favoredAccount.identifier,
+                  date: new Date(),
+                },
+              ];
+
+              fStatement.update({
+                AccountID: favoredAccount.id,
+                data: newDataFavored,
+              });
+            }
+          })
+          .catch(() => {
+            BankStatement.create({
+              AccountID: favoredAccount.id,
+              data: [
+                {
+                  ammount,
+                  favoredIdentifier: favoredAccount.identifier,
+                  date: new Date(),
+                },
+              ],
+            });
+          });
+      }
+    })
+    .catch(async () => {
+      BankStatement.create({
+        AccountID: userAccount,
+        data: [
+          {
+            ammount,
+            favoredIdentifier: favoredAccount.identifier,
+            date: new Date(),
+          },
+        ],
+      });
+
+      await BankStatement.findOne({
+        where: { AccountID: favoredAccount.id },
+      })
+        .then((fStatement) => {
+          if (fStatement.data) {
+            const newDataFavored = [
+              ...fStatement.data,
+              {
+                ammount,
+                favoredIdentifier: favoredAccount.identifier,
+                date: new Date(),
+              },
+            ];
+
+            fStatement.update({
+              AccountID: favoredAccount.id,
+              data: newDataFavored,
+            });
+          }
+        })
+        .catch(() => {
+          BankStatement.create({
+            AccountID: favoredAccount.id,
+            data: [
+              {
+                ammount,
+                favoredIdentifier: favoredAccount.identifier,
+                date: new Date(),
+              },
+            ],
+          });
+        });
+    });
 }
 
 module.exports = { getStatement, createBankingState };

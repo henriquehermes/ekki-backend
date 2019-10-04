@@ -7,13 +7,8 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      ammount: {
-        allowNull: false,
-        type: Sequelize.FLOAT,
-      },
-      favoredIdentifier: {
-        allowNull: false,
-        type: Sequelize.INTEGER,
+      data: {
+        type: Sequelize.ARRAY(Sequelize.JSONB),
       },
       AccountID: {
         type: Sequelize.INTEGER,
@@ -23,10 +18,6 @@ module.exports = {
           },
           key: 'id', // key in Target model that we're referencing
         },
-      },
-      date: {
-        allowNull: false,
-        type: Sequelize.DATE,
       },
     });
 
